@@ -63,9 +63,17 @@ return {
       -- online, please don't ask me how to install them :)
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
-        'delve',
+        'python',
       },
     }
+
+    -- Configure vscode-like launch.json
+    require('dap.ext.vscode').load_launchjs(nil, { python = { 'python' } })
+    -- Close neotree when debug starts
+    -- Attach event listener to close neo-tree on debugging start
+    dap.listeners.after.event_initialized['close_neotree_on_debug_start'] = function()
+      vim.cmd 'Neotree close'
+    end
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
@@ -104,14 +112,5 @@ return {
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
-
-    -- Install golang specific config
-    require('dap-go').setup {
-      delve = {
-        -- On Windows delve must be run attached or it crashes.
-        -- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
-        detached = vim.fn.has 'win32' == 0,
-      },
-    }
   end,
 }
